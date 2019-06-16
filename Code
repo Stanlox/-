@@ -1,0 +1,130 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Шифр_трисемуса
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Coding coding = new Coding();
+            coding.Table();
+            coding.Trithemius();
+            Console.ReadKey();
+        }
+    }
+    class Coding
+    {
+        char[] alphabet = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".ToCharArray();
+        char[] keyWord;
+        char[,] table;
+        string s1 = "", s2 = ""; //строки для хранения зашифрованного символа 
+        string encodetString = ""; //зашифрованая строка
+        string text = ""; //исходный текст для шифрования
+        int i_first = 0, j_first = 0;  //координаты первого символа пары
+        int i_second = 0, j_second = 0;//координаты второго символа пары
+        int rows = 4;
+        int columns = 8;
+        int i, j;
+
+        public void Table()
+        {
+            try
+            {
+                //Ключевое слово
+                Console.Write("Введите ключевое слово: ");
+                keyWord = Console.ReadLine().ToUpper().Distinct().ToArray();
+                if (keyWord.Length >= alphabet.Length) throw new Exception("Ключевое слово содержит символов больше размер алфавита");
+                if (keyWord.Except(alphabet).Any()) throw new Exception("Ключевое слово содержит символов которых нет в алфавите");
+                if (keyWord.Length == 0) throw new Exception("Вы ничего не ввели");
+                //Слово для шифровки
+                Console.Write("Введите текст для зашифровки: ");
+
+                text = Console.ReadLine().ToUpper();
+                text = text.Replace(" ", string.Empty);
+                if (text.Length == 0) throw new Exception("Вы ничего не ввели");
+                if (text.ToCharArray().Except(alphabet).Any()) throw new Exception("Ключевое слово содержит символов которых нет в алфавите");
+
+                // Создаем таблицу
+                rows = alphabet.Length / columns;
+                table = new char[rows, columns];
+
+                // Вписываем в нее ключевое слово
+                for (i = 0; i < keyWord.Length; i++)
+                {
+                    table[i / columns, i % columns] = keyWord[i];
+                }
+
+                // Исключаем уникальные символы ключевого слова из алфавита
+                alphabet = alphabet.Except(keyWord).ToArray();
+
+
+                //Создаем алфавит
+                for (i = 0; i < alphabet.Length; i++)
+                {
+                    int position = i + keyWord.Length;
+                    table[position / columns, position % columns] = alphabet[i];
+                }
+
+                //Выводим алфавит
+                for (i = 0; i < rows; i++)
+                {
+                    for (j = 0; j < columns; j++)
+                    {
+                        Console.Write(table[i, j] + " ");
+                    }
+                    Console.WriteLine();
+                }
+
+                //if (codingtext.Except(alphabet).Any()) throyftvgbw new Exception("Текст содержит символы которых нет в алфавите");
+                //text = codingtext.ToString();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.ReadKey();
+                Environment.Exit(0);
+            }
+        }
+
+        public void Trithemius()
+        {
+            // Создаем место для будущего зашифрованного сообщения
+            var result = new char[text.Length];
+
+            // Шифруем сообщение
+            for (int k = 0; k < text.Length; k++)
+            {
+                char symbol = text[k];
+                // Пытаемся найти символ в таблице
+                for (var i = 0; i < rows; i++)
+                {
+                    for (var j = 0; j < columns; j++)
+                    {
+                        if (symbol == table[i, j])
+                        {
+                            symbol = table[(i + 1) % rows, j]; // Смещаемся циклически на следующую строку таблицы и запоминаем новый символ
+                            i = rows; // Завершаем цикл по строкам
+                            break; // Завершаем цикл по колонкам
+                        }
+                    }
+                }
+                // Записываем найденный символ
+                result[k] = symbol;
+            }
+
+            // Выводим зашифрованное сообщение
+            Console.WriteLine("Трисемус: " + new string(result));
+        }
+    }
+
+}
+            
+        
+
+
+    
+
